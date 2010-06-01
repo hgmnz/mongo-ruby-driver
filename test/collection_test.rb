@@ -642,6 +642,16 @@ class TestCollection < Test::Unit::TestCase
         assert @collection.index_information['b_1_a_1']
       end
     end
+
+    context "with a custom index name" do
+      setup do
+        @collection.create_index('a', :name => 'custom_name')
+      end
+
+      should "use the specified index name" do
+        assert @collection.index_information['custom_name']
+      end
+    end
   end
 
   context "Capped collections" do

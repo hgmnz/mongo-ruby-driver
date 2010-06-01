@@ -355,6 +355,7 @@ module Mongo
     #   this option will keep the first document the database indexes and drop all subsequent with duplicate values.
     # @option opts [Integer] :min specify the minimum longitude and latitude for a geo index.
     # @option opts [Integer] :max specify the maximum longitude and latitude for a geo index.
+    # @option opts [String]  :name specify a custom name for the index.
     #
     # @example Creating a compound index:
     #   @posts.create_index([['subject', Mongo::ASCENDING], ['created_at', Mongo::DESCENDING]])
@@ -374,7 +375,7 @@ module Mongo
     #
     # @core indexes create_index-instance_method
     def create_index(spec, opts={})
-      opts.assert_valid_keys(:min, :max, :background, :unique, :dropDups)
+      opts.assert_valid_keys(:min, :max, :background, :unique, :dropDups, :name)
       field_spec = BSON::OrderedHash.new
       if spec.is_a?(String) || spec.is_a?(Symbol)
         field_spec[spec.to_s] = 1
@@ -392,7 +393,7 @@ module Mongo
           "should be either a string, symbol, or an array of arrays."
       end
 
-      name = generate_index_name(field_spec)
+      name = opts.delete(:name) { generate_index_name(field_spec) }
 
       selector = {
         :name   => name,
